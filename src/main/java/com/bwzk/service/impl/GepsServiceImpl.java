@@ -27,8 +27,13 @@ public class GepsServiceImpl implements GepsService {
 		return mlJdbcDao.quertListMap("SELECT * FROM JGZLZJ_ML");
 	}
 	
-	
-	
+	/**
+	 * <p>Title: 得到代码表的map</p>
+	 * <p>Description: </p>
+	 * @return
+	 * 
+	 * @date 2014年1月20日
+	*/
 	private GepsMappingBean getMappingList(){
 		List<Map<String, Object>> codeMappingList = null;
 		if(null == gepsMapping){
