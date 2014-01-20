@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Result>
+	<DocInfo>
+		<Field ColName="qzh" DisName="全宗号" type="string" Value="ZCB"></Field>
+		<Field ColName="doctype" DisName="文件类别" type="string" Value="发文文档"></Field>
+		<Field ColName="DocTitle" DisName="标题" type="string" Value="jtbbbbbb"></Field>
+		<Field ColName="Uploader" DisName="上传者" type="string" Value="张三"></Field>
+		<Field ColName="DocKeyword" DisName="关键字" type="string" Value="（可空）"></Field>
+		<Field ColName="DocAbstract" DisName="摘要" type="string" Value="（可空）"></Field>
+		<Field ColName="DocCode" DisName="文档编号" type="string" Value="（可空）"></Field>
+		<Field ColName="发文类型" DisName="发文类型" type="string" Value="平行文"></Field>
+		<Field ColName="发文编号" DisName="发文编号" type="string" Value="广发行【2013】2号"></Field>
+		<Field ColName="封发日期" DisName="封发日期" type="date" Value="2013-8-26"></Field>
+		<Field ColName="份数" DisName="份数" type="int" Value="12"></Field>
+		<Field ColName="印刷时间" DisName="印刷时间" type="time" Value="2013-8-26 10:28:32"></Field>
+		<Field ColName="depcode" DisName="归档部门code" type="string" Value="5000301"></Field>
+	</DocInfo>
+	<Attachments>
+		<Attachment type="正文" fileid="1024" filesize="23656" filename="卡看.pdf" pzm="data"
+			ftpdir="/ZCB/D_FILE11/2013-12-16/138718459753394366d94ce1a4b8c8fd37e68bff373bd.pdf"/>
+		<Attachment type="正文" fileid="1024" filesize="23656" filename="测试.docx" pzm="data"
+			ftpdir="/ZCB/D_FILE11/2013-12-16/13871846142408120f89172274a9b86f69d2b116a86a9.docx"/>
+	</Attachments>
+</Result>

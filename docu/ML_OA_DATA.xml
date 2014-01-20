@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Result>
+	<DocInfo>
+		<Field ColName="qzh" DisName="全宗号" type="string" Value="A001"></Field>
+		<Field ColName="doctype" DisName="文件类别" type="string" Value="（发文文档、收文文档、普通文档）"></Field>
+		<Field ColName="DocTitle" DisName="标题" type="string" Value="123"></Field>
+		<Field ColName="Uploader" DisName="上传者" type="string" Value="张三"></Field>
+		<Field ColName="DocKeyword" DisName="关键字" type="string" Value="（可空）"></Field>
+		<Field ColName="DocAbstract" DisName="摘要" type="string" Value="（可空）"></Field>
+		<Field ColName="DocCode" DisName="文档编号" type="string" Value="（可空）"></Field>
+		<Field ColName="发文类型" DisName="发文类型" type="string" Value="平行文"></Field>
+		<Field ColName="发文编号" DisName="发文编号" type="string" Value="广发行【2013】2号"></Field>
+		<Field ColName="封发日期" DisName="封发日期" type="date" Value="2013-8-26"></Field>
+		<Field ColName="份数" DisName="份数" type="int" Value="12"></Field>
+		<Field ColName="印刷时间" DisName="印刷时间" type="time" Value="2013-8-26 10:28:32"></Field>
+		<Field ColName="depcode" DisName="归档部门code" type="string" Value="2312531"></Field>
+	</DocInfo>
+	<Attachments>
+		<Attachment type="正文" fileid="1024" filesize="70656" filename="关于任命的收文.docx" pzm="2013FTP"
+			ftpdir="/gui/2013/2013082248572345.docx"/>
+		<Attachment type="附件" fileid="1024" filesize="70656" filename="关于任命的发文.docx" pzm="2011FTP"
+			ftpdir="/gui/2013/2013082248578946.docx"/>
+	</Attachments>
+</Result>

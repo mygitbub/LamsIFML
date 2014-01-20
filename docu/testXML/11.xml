@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Result>
+<DocInfo>
+<Field Value='gui' type='string' DisName='全宗号' ColName='qzh'/>
+<Field Value='发文文档' type='string' DisName='文件类别' ColName='doctype'/>
+<Field Value='1111' type='string' DisName='标题' ColName='DocTitle'/>
+<Field Value='杜永妍' type='string' DisName='上传者' ColName='Uploader'/>
+<Field Value='' type='string' DisName='关键字' ColName='DocKeyword'/>
+<Field Value='再要' type='string' DisName='摘要' ColName='DocAbstract'/>
+<Field Value='编号' type='string' DisName='文档编号' ColName='DocCode'/>
+<Field Value='类型' type='string' DisName='发文类型' ColName='发文类型'/>
+<Field Value='发文号' type='string' DisName='发文编号' ColName='发文编号'/>
+<Field Value='2012/2/3 0:00:00' type='date' DisName='封发日期' ColName='封发日期'/>
+<Field Value='1' type='int' DisName='份数' ColName='份数'/>
+<Field Value='2013-12-17 14:57:04' type='time' DisName='印刷时间' ColName='印刷时间'/>
+<Field Value='' type='string' DisName='归档部门code' ColName='depcode'/>
+</DocInfo>
+<Attachments>
+<Attachment type='正文' ftpdir='/gui/2013/201312171457037573.png' pzm='ftp://192.168.94.30' filename='1111.png' filesize='' fileid='100351'/> 
+</Attachments>
+</Result>

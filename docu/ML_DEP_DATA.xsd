@@ -1,0 +1,22 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="NewDataSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Table" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:short" name="DEP_ID"/>
+              <xs:element type="xs:short" name="DEP_PARENT_ID"/>
+              <xs:element type="xs:string" name="DEP_CODE"/>
+              <xs:element type="xs:string" name="DEP_NAME"/>
+              <xs:element type="xs:byte" name="DEP_ORDER"/>
+              <xs:element type="xs:byte" name="DEP_TYPE"/>
+              <xs:element type="xs:string" name="DEP_ATTRIBUTES"/>
+              <xs:element type="xs:byte" name="DEP_PLATFORMID"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

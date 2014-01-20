@@ -1,0 +1,25 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="NewDataSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Table" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:short" name="USR_ID"/>
+              <xs:element type="xs:string" name="USR_CODE"/>
+              <xs:element type="xs:string" name="USR_NAME"/>
+              <xs:element type="xs:short" name="USR_DEP_ID"/>
+              <xs:element type="xs:byte" name="USR_ORDER"/>
+              <xs:element type="xs:string" name="USR_SEX"/>
+              <xs:element type="xs:string" name="USR_MOBILE"/>
+              <xs:element type="xs:string" name="USR_OFFICE_EMAIL"/>
+              <xs:element type="xs:byte" name="USR_STATUS"/>
+              <xs:element type="xs:string" name="USR_PWDMD5"/>
+              <xs:element type="xs:byte" name="USR_PLATFORMID"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

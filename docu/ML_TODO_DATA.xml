@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ToDoTasks>
+<Task F_TaskID="1" F_NetModuleID="1101010100" F_TaskName="AAA" F_BeginDate="2008-9-25" F_CreateDate="2008-9-12" F_CreatorUsrName="刘冰" F_TaskLinkUrl="http://10.10.10.10:8899/Source/Test/Task.aspx?ID=1code=lxptoken=fdjfk-2jdkj2-42kjdfds">
+</Task>
+<Task F_TaskID="2" F_NetModuleID="1101010100" F_TaskName="BBB" F_BeginDate="2008-9-25" F_CreateDate="2008-9-12" F_CreatorUsrName="翟振涛" F_TaskLinkUrl="http://10.10.10.10:8899/Source/Test/Task.aspx?ID=2code=lxptoken=fdjfk-2jdkj2-42kjdfds ">
+</Task>
+<Task F_TaskID="3" F_NetModuleID="1201010100" F_TaskName="CCC" F_BeginDate="2008-9-25" F_CreateDate="2008-9-12" F_CreatorUsrName="隋彬" F_TaskLinkUrl="http://10.10.10.10:8899/Source/Test/Task.aspx?ID=3code=lxptoken=fdjfk-2jdkj2-42kjdfds ">
+</Task>
+</ToDoTasks>
