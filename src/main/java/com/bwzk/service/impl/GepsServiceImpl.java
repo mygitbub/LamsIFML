@@ -69,20 +69,20 @@ public class GepsServiceImpl implements GepsService {
 	public Boolean updateXmStatus(Integer xmid){// test  1749501150
 		Boolean flag = false;
 		try {
-			mlJdbcDao.update("UPDATE JGZLZJ_XM SET GEPSSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_XM
-			mlJdbcDao.update("UPDATE JGZLZJ_DWGC SET GEPSSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_DWGC
+			mlJdbcDao.update("UPDATE JGZLZJ_XM SET OTHERSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_XM
+			mlJdbcDao.update("UPDATE JGZLZJ_DWGC SET OTHERSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_DWGC
 			List<Map<String, Object>> dwgcList = mlJdbcDao.quertListMap("SELECT XMID,DWGCID FROM JGZLZJ_DWGC WHERE XMID=" + xmid);
 			for (Map<String, Object> dwgc : dwgcList) {
 				Integer dwgcId = dwgc.get("DWGCID") == null ? -1 : Integer.parseInt(dwgc.get("DWGCID").toString());
-				mlJdbcDao.update("UPDATE JGZLZJ_ML SET GEPSSTATE="+getsState+" WHERE DWGCID=" + dwgcId);// JGZLZJ_ML
+				mlJdbcDao.update("UPDATE JGZLZJ_ML SET OTHERSTATE="+getsState+" WHERE DWGCID=" + dwgcId);// JGZLZJ_ML
 				List<Map<String, Object>> mlList = mlJdbcDao.quertListMap("SELECT MLID,DWGCID FROM JGZLZJ_ML WHERE DWGCID=" + dwgcId);
 				for (Map<String, Object> ml : mlList) {
 					Integer mlid = ml.get("MLID") == null ? -1 : Integer.parseInt(ml.get("MLID").toString());
-					mlJdbcDao.update("UPDATE JGZLZJ_ZL SET GEPSSTATE="+getsState+" WHERE MLID=" + mlid);// JGZLZJ_ZL
+					mlJdbcDao.update("UPDATE JGZLZJ_ZL SET OTHERSTATE="+getsState+" WHERE MLID=" + mlid);// JGZLZJ_ZL
 					List<Map<String, Object>> zlList = mlJdbcDao.quertListMap("SELECT ZLID,MLID FROM JGZLZJ_ZL WHERE MLID=" + mlid);
 					for (Map<String, Object> zl : zlList) {
 						Integer zlid = zl.get("ZLID") == null ? -1 : Integer.parseInt(zl.get("ZLID").toString());
-						mlJdbcDao.update("UPDATE JGZLZJ_FILE SET GEPSSTATE="+getsState+" WHERE ZLID=" + zlid);// JGZLZJ_FILE
+						mlJdbcDao.update("UPDATE JGZLZJ_FILE SET OTHERSTATE="+getsState+" WHERE ZLID=" + zlid);// JGZLZJ_FILE
 					}
 					
 				}
