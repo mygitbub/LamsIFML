@@ -11,29 +11,16 @@ import java.io.Serializable;
  */
 public class GepsMappingBean implements Serializable{
 	private static final long serialVersionUID = 2219337505528263682L;
-	private String prjTableName ;
-	private String volTableName;
-	private String dFileTableName;
+	private Integer libcode;
 	private String prjSql;
 	private String volSql;
 	private String dFileSql;
-	public String getPrjTableName() {
-		return prjTableName;
+	private String eFileSql;
+	public Integer getLibcode() {
+		return libcode;
 	}
-	public void setPrjTableName(String prjTableName) {
-		this.prjTableName = prjTableName;
-	}
-	public String getVolTableName() {
-		return volTableName;
-	}
-	public void setVolTableName(String volTableName) {
-		this.volTableName = volTableName;
-	}
-	public String getdFileTableName() {
-		return dFileTableName;
-	}
-	public void setdFileTableName(String dFileTableName) {
-		this.dFileTableName = dFileTableName;
+	public void setLibcode(Integer libcode) {
+		this.libcode = libcode;
 	}
 	public String getPrjSql() {
 		return prjSql;
@@ -53,4 +40,14 @@ public class GepsMappingBean implements Serializable{
 	public void setdFileSql(String dFileSql) {
 		this.dFileSql = dFileSql;
 	}
+	public String geteFileSql() {
+		return eFileSql;
+	}
+	public void seteFileSql(String eFileSql) {
+		this.eFileSql = eFileSql;
+	}
+	
+	
+	
+	
 }

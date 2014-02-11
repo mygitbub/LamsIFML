@@ -28,7 +28,7 @@ public class GepsServiceImpl implements GepsService {
 	}
 	
 	/**
-	 * <p>Title: 得到代码表的map</p>
+	 * <p>Title: 得到Lams和geps的对应代码表的map</p>
 	 * <p>Description: </p>
 	 * @return
 	 * 
@@ -38,22 +38,20 @@ public class GepsServiceImpl implements GepsService {
 		List<Map<String, Object>> codeMappingList = null;
 		if(null == gepsMapping){
 			gepsMapping = new GepsMappingBean();
-			codeMappingList = jdbcDao.quertListMap("select F1 XH, F2 TABLENAME, F3 SQL from " + gepsCodeTableName);
+			codeMappingList = jdbcDao.quertListMap("select F1 XH, F2 LIBCODE, F3 SQL from " + gepsCodeTableName);
 			for (Map<String, Object> map : codeMappingList) {
 				String theSql = map.get("SQL") == null ? "" : map.get("SQL").toString();
 				Integer xhKey = map.get("XH") == null ? 0 : Integer.parseInt(map.get("XH").toString());
-				String theTableName = map.get("TABLENAME") == null ? "" : map.get("TABLENAME").toString();
+				Integer theLibCode = map.get("LIBCODE") == null ? -1 : Integer.parseInt(map.get("TABLENAME").toString());
+				gepsMapping.setLibcode(theLibCode);
 				switch (xhKey) {
 					case 1:
-						gepsMapping.setPrjTableName(theTableName);
 						gepsMapping.setPrjSql(theSql);
 						break;
 					case 2:
-						gepsMapping.setVolTableName(theTableName);
 						gepsMapping.setVolSql(theSql);
 						break;
 					case 3:
-						gepsMapping.setdFileTableName(theTableName);
 						gepsMapping.setdFileSql(theSql);
 						break;
 					default:
