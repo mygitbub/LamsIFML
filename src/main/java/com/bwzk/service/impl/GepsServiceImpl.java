@@ -2,7 +2,9 @@ package com.bwzk.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,47 +19,88 @@ import com.bwzk.pojo.GepsMappingBean;
 import com.bwzk.service.i.GepsService;
 @Service("gepsService")
 public class GepsServiceImpl implements GepsService {
-
+	@Transactional("txManager_ML")
 	public List<Map<String, Object>> projectList() {
 		GepsMappingBean gepsMappingBean = getMappingList();
+
+		List<Map<String, Object>> volMapList = null;
+		List<Map<String, Object>> dFileMapList = null;
+		List<Map<String, Object>> eFileMapList = null;
+		List<Map<String, Object>> prjMapList = mlJdbcDao.quertListMap(gepsMappingBean.getPrjSql());
+
+		for (Map<String, Object> prjItem : prjMapList) {
+			insertMap(gepsMappingBean.getPrjTableName(), prjItem);// -- 插入项目
+			Integer xmid = getIntValue(prjItem, "XMID");
+			Integer mlPrjDid = getIntValue(prjItem, "MLDID");
+			// 插入prjitem 然后查询案卷
+			volMapList = mlJdbcDao.quertListMap(gepsMappingBean.getVolSql()+" WHERE MLPID=" + mlPrjDid);
+			for (Map<String, Object> volItem : volMapList) {
+				insertMap(gepsMappingBean.getVolTableName(), volItem);// -- 插入案卷
+				Integer mlVolDid = getIntValue(volItem, "MLDID");
+				dFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.getdFileSql()+" WHERE MLPID=" + mlVolDid);
+				for (Map<String, Object> dFileItem : dFileMapList) {
+					insertMap(gepsMappingBean.getDfileTableName(), dFileItem);// -- 插入文件
+					Integer mlDfileDid = getIntValue(dFileItem, "MLDID");
+					eFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.geteFileSql()+" WHERE MLPID=" + mlVolDid);
+					for (Map<String, Object> efileItem : eFileMapList) {
+						insertMap(gepsMappingBean.getEfileTableName(), efileItem);// -- 插入电子文件
+						System.out.println(efileItem);
+					}
+				}
+			}
+			
+			//添加一条项目 修改一条
+			updateXmStatus(xmid);
+		}
+		
 		System.out.println(gepsMappingBean.getPrjSql());
+		
 		System.out.println(gepsMappingBean.getVolSql());
 		System.out.println(gepsMappingBean.getdFileSql());
+		System.out.println(gepsMappingBean.geteFileSql());
 
 		return mlJdbcDao.quertListMap("SELECT * FROM JGZLZJ_ML");
 	}
 	
 	/**
 	 * <p>Title: 得到Lams和geps的对应代码表的map</p>
-	 * <p>Description: </p>
+	 * <p>项目级别(0) D_PRJ_LEVEL(0)<br>案卷级别(1) D_VOL_LEVEL(1)<br> 文件级别(2) D_FILE_LEVEL(2)<br> 电子原文级别(3) E_EFILE_LEVEL(3)
+	 * </p>
 	 * @return
-	 * 
 	 * @date 2014年1月20日
 	*/
 	private GepsMappingBean getMappingList(){
 		List<Map<String, Object>> codeMappingList = null;
 		if(null == gepsMapping){
-			gepsMapping = new GepsMappingBean();
-			codeMappingList = jdbcDao.quertListMap("select F1 XH, F2 LIBCODE, F3 SQL from " + gepsCodeTableName);
-			for (Map<String, Object> map : codeMappingList) {
-				String theSql = map.get("SQL") == null ? "" : map.get("SQL").toString();
-				Integer xhKey = map.get("XH") == null ? 0 : Integer.parseInt(map.get("XH").toString());
-				Integer theLibCode = map.get("LIBCODE") == null ? -1 : Integer.parseInt(map.get("TABLENAME").toString());
-				gepsMapping.setLibcode(theLibCode);
-				switch (xhKey) {
-					case 1:
+			try {
+				gepsMapping = new GepsMappingBean();
+				codeMappingList = jdbcDao.quertListMap("SELECT F1 LEVEL, F2 LIBCODE, F3 TSQL FROM " + gepsCodeTableName);
+				for (Map<String, Object> map : codeMappingList) {
+					Integer theLevel = map.get("LEVEL") == null ? -1 : Integer.parseInt(map.get("LEVEL").toString());
+					Integer theLibCode = map.get("LIBCODE") == null ? -1 : Integer.parseInt(map.get("LIBCODE").toString());
+					String theSql = map.get("TSQL") == null ? "" : map.get("TSQL").toString();
+					gepsMapping.setLibcode(theLibCode);
+					switch (theLevel) {
+					case 0://prj level
 						gepsMapping.setPrjSql(theSql);
 						break;
-					case 2:
+					case 1://vol level
 						gepsMapping.setVolSql(theSql);
 						break;
-					case 3:
+					case 2://dFile level
 						gepsMapping.setdFileSql(theSql);
+						break;
+					case 3://eFile level
+						gepsMapping.seteFileSql(theSql);
 						break;
 					default:
 						log.error("初始化geps和紫光档案系统 geps对应表 错误 ");
 						break;
+					}
 				}
+			} catch (Exception e) {
+				log.error("初始化geps和紫光档案系统 geps对应表 错误 " + e.getMessage());
+				gepsMapping = null;
 			}
 		}
 		return gepsMapping;
@@ -91,6 +134,56 @@ public class GepsServiceImpl implements GepsService {
 			log.error(e.getMessage() , e);
 		}
 		return flag;
+	}
+	
+	/**
+	 * <p>通过key的到map里面的值并且返回int</p>
+	 * <p>Description: </p>
+	 * @param mapItem 一个map
+	 * @param key 
+	 * @return 一个 int值 返回 -1 表示错误
+	 * @date 2014年2月13日
+	*/
+	private Integer getIntValue(Map<String , Object> mapItem , String key){
+		Integer tempInt = -1;
+		if(mapItem != null && mapItem.get(key) != null && mapItem.get(key) instanceof Integer){
+			try {
+				tempInt = Integer.parseInt(mapItem.get(key).toString());
+			} catch (Exception e) {
+				tempInt = -1;
+				log.error(e.getMessage() , e);
+			}
+		}
+		return tempInt;
+	}
+
+	private Boolean insertMap(String tableName , Map<String , Object> valueMap){
+		Boolean result = false;
+		if(StringUtils.isNotEmpty(tableName) && valueMap != null){
+			StringBuffer fields = new StringBuffer();
+			StringBuffer insertSql = new StringBuffer("INSERT INTO ").append(tableName);
+			StringBuffer values = new StringBuffer();
+			try {
+				Set<String> keySet = valueMap.keySet();
+				for (String key : keySet) {
+					Object obj = valueMap.get(key);
+					if(obj == null){
+						System.out.println("null");
+					}else{
+						System.out.println(obj.getClass().getName());
+					}
+				}
+				
+				insertSql.append("(").append(fields.toString()).append(") VALUES (").append(values.toString()).append(")");
+				System.out.println(insertSql.toString());
+//				jdbcDao.insert(insertSql.toString());
+			} catch (Exception e) {
+				log.error(e.getMessage() , e);
+			}
+			
+		}
+		
+		return result;
 	}
 	
 	@Autowired

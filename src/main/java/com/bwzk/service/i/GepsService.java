@@ -20,6 +20,12 @@ public interface GepsService {
 	 * @date 2014年1月14日
 	*/
 	public List<Map<String , Object>> projectList();
+	/**
+	 * <p>通过项目的id批量更新已同步状态</p>
+	 * @param xmid 项目主键ID
+	 * @return
+	 * @date 2014年2月12日
+	*/
 	public Boolean updateXmStatus(Integer xmid);
 
 }
