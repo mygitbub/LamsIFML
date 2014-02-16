@@ -27,5 +27,4 @@ public interface GepsService {
 	 * @date 2014年2月12日
 	*/
 	public Boolean updateXmStatus(Integer xmid);
-
 }

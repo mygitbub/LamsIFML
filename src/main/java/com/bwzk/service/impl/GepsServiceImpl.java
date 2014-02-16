@@ -1,5 +1,7 @@
 package com.bwzk.service.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,49 +18,59 @@ import ch.qos.logback.classic.Logger;
 import com.bwzk.dao.JdbcDao;
 import com.bwzk.dao.MlJdbcDaoImpl;
 import com.bwzk.pojo.GepsMappingBean;
+import com.bwzk.service.BaseService;
 import com.bwzk.service.i.GepsService;
+import com.bwzk.util.GlobalFinalAttr;
 @Service("gepsService")
-public class GepsServiceImpl implements GepsService {
-	@Transactional("txManager_ML")
+public class GepsServiceImpl  extends BaseService  implements GepsService {
 	public List<Map<String, Object>> projectList() {
 		GepsMappingBean gepsMappingBean = getMappingList();
 
 		List<Map<String, Object>> volMapList = null;
 		List<Map<String, Object>> dFileMapList = null;
 		List<Map<String, Object>> eFileMapList = null;
+		//通过代码表的项目查询语句 查询geps中间库的 未归档的项目列表
 		List<Map<String, Object>> prjMapList = mlJdbcDao.quertListMap(gepsMappingBean.getPrjSql());
 
 		for (Map<String, Object> prjItem : prjMapList) {
-			insertMap(gepsMappingBean.getPrjTableName(), prjItem);// -- 插入项目
 			Integer xmid = getIntValue(prjItem, "XMID");
 			Integer mlPrjDid = getIntValue(prjItem, "MLDID");
 			// 插入prjitem 然后查询案卷
 			volMapList = mlJdbcDao.quertListMap(gepsMappingBean.getVolSql()+" WHERE MLPID=" + mlPrjDid);
+			
+			prjItem.remove("XMID");
+			prjItem.remove("MLDID");
+			prjItem.put("PID", -1);
+			Integer unisPrjDid = insertMap(gepsMappingBean.getPrjTableName(), prjItem);// -- 插入项目
 			for (Map<String, Object> volItem : volMapList) {
-				insertMap(gepsMappingBean.getVolTableName(), volItem);// -- 插入案卷
 				Integer mlVolDid = getIntValue(volItem, "MLDID");
 				dFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.getdFileSql()+" WHERE MLPID=" + mlVolDid);
+				
+				volItem.remove("MLDID");
+				volItem.remove("MLPID");
+				volItem.put("PID", unisPrjDid);
+				Integer unisVolDid = insertMap(gepsMappingBean.getVolTableName(), volItem);// -- 插入案卷
 				for (Map<String, Object> dFileItem : dFileMapList) {
-					insertMap(gepsMappingBean.getDfileTableName(), dFileItem);// -- 插入文件
 					Integer mlDfileDid = getIntValue(dFileItem, "MLDID");
-					eFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.geteFileSql()+" WHERE MLPID=" + mlVolDid);
+					eFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.geteFileSql()+" WHERE MLPID=" + mlDfileDid);
+					
+					dFileItem.remove("MLDID");
+					dFileItem.remove("MLPID");
+					dFileItem.put("PID", unisVolDid);
+					dFileItem.put("ATTACHED", eFileMapList.size() > 0 ? 1  : 0 );//判断是否有电子文件 0 没有 1有
+					Integer unisDfileDid = insertMap(gepsMappingBean.getDfileTableName(), dFileItem);// -- 插入文件
 					for (Map<String, Object> efileItem : eFileMapList) {
+						efileItem.remove("MLDID");
+						efileItem.remove("MLPID");
+						efileItem.put("PID", unisDfileDid);
 						insertMap(gepsMappingBean.getEfileTableName(), efileItem);// -- 插入电子文件
-						System.out.println(efileItem);
 					}
 				}
 			}
-			
 			//添加一条项目 修改一条
 			updateXmStatus(xmid);
 		}
 		
-		System.out.println(gepsMappingBean.getPrjSql());
-		
-		System.out.println(gepsMappingBean.getVolSql());
-		System.out.println(gepsMappingBean.getdFileSql());
-		System.out.println(gepsMappingBean.geteFileSql());
-
 		return mlJdbcDao.quertListMap("SELECT * FROM JGZLZJ_ML");
 	}
 	
@@ -157,33 +169,50 @@ public class GepsServiceImpl implements GepsService {
 		return tempInt;
 	}
 
-	private Boolean insertMap(String tableName , Map<String , Object> valueMap){
-		Boolean result = false;
+	/**
+	 * <p>将map插入 指定的表内</p>
+	 * <p>Description: </p>
+	 * @param tableName 表名
+	 * @param valueMap Map对象
+	 * @return
+	 * 
+	 * @date 2014年2月16日
+	*/
+	private Integer insertMap(String tableName , Map<String , Object> valueMap){
+		Integer maxDid = -1;
 		if(StringUtils.isNotEmpty(tableName) && valueMap != null){
 			StringBuffer fields = new StringBuffer();
-			StringBuffer insertSql = new StringBuffer("INSERT INTO ").append(tableName);
 			StringBuffer values = new StringBuffer();
+			StringBuffer insertSql = new StringBuffer("INSERT INTO ").append(tableName);
+			maxDid = getMaxDid(tableName);
 			try {
 				Set<String> keySet = valueMap.keySet();
 				for (String key : keySet) {
-					Object obj = valueMap.get(key);
-					if(obj == null){
-						System.out.println("null");
-					}else{
-						System.out.println(obj.getClass().getName());
+					Object theValue = valueMap.get(key);
+					if(theValue != null){
+//						System.out.println(theValue.getClass());
+						fields.append(key).append(",");
+						if(theValue instanceof Timestamp){
+							values.append(GlobalFinalAttr.DatabaseType.SQLSERVER.generateTimeToSQLDate(theValue))
+								.append(",");
+						}else if(theValue instanceof Integer){
+							values.append(theValue).append(",");
+						}else{
+							values.append("'").append(theValue).append("'").append(",");
+						}
 					}
 				}
-				
+				fields.append("DID");
+				values.append(maxDid);
 				insertSql.append("(").append(fields.toString()).append(") VALUES (").append(values.toString()).append(")");
 				System.out.println(insertSql.toString());
-//				jdbcDao.insert(insertSql.toString());
+				jdbcDao.insert(insertSql.toString());
 			} catch (Exception e) {
 				log.error(e.getMessage() , e);
 			}
 			
 		}
-		
-		return result;
+		return maxDid;
 	}
 	
 	@Autowired

@@ -14,12 +14,12 @@ public class MlJdbcTest {
 	@Autowired
 	private GepsService gepsService;
 //updateXmStatus(Integer xmid){// test  1749501150
-	@Test
-	public void test01() {
-		System.out.println(gepsService.updateXmStatus(1749501150));
-	}
+//	@Test
+//	public void test01() {
+//		System.out.println(gepsService.updateXmStatus(1749501150));
+//	}
 	@Test
 	public void test02() {
-		System.out.println(gepsService.projectList());
+		gepsService.projectList();
 	}
 }
