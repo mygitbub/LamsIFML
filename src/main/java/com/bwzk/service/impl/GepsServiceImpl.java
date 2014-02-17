@@ -221,7 +221,7 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 	private MlJdbcDaoImpl mlJdbcDao;
 	
 	@Autowired
-	@Value("${unit.geps.codetable}")
+	@Value("${unis.geps.codetable}")
 	private String gepsCodeTableName;
 	
 	/** -1：本记录被删除；0：本记录是新增记录；>1：本记录更新；默认为0*/
