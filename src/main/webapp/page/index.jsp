@@ -36,7 +36,9 @@
 			<a class="btn btn-lg btn-info"
 				href="${pageContext.request.contextPath}/cxf">查看服务</a>
 			<a class="btn btn-lg btn-danger"
-				href="${pageContext.request.contextPath}/initMapping">初始化接口代码表</a>
+				href="${pageContext.request.contextPath}/initMapping">初始化接口代码表</a><br>
+			<a class="btn btn-lg btn-info"
+				href="${pageContext.request.contextPath}/gepsSync">接收项目档案数据</a>
 		</p>
 	</div>
 </body>

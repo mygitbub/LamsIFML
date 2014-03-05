@@ -29,6 +29,7 @@ import org.tempuri.MrBaseServiceSoap;
 import ch.qos.logback.classic.Logger;
 
 import com.bwzk.service.i.ArcService;
+import com.bwzk.service.i.GepsService;
 import com.bwzk.service.i.NoticeService;
 import com.bwzk.util.GlobalFinalAttr;
 
@@ -108,6 +109,14 @@ public class CommonCtler {
 	@RequestMapping(value={"/initMapping"})
 	public String initMapping() {
 		arcServcieImpl.initMlFieldMapping();
+		return "index.jsp";
+	}
+	/**
+	 *接收梦龙项目管理中间库数据
+	 */
+	@RequestMapping(value={"/gepsSync"})
+	public String gepsSync() {
+		gepsService.projectList();
 		return "index.jsp";
 	}
 
@@ -200,6 +209,8 @@ public class CommonCtler {
 	private ArcService arcServcieImpl;
 	@Autowired
 	private NoticeService noticeServiceImpl;
+	@Autowired
+	private GepsService gepsService;
 	//日志地址
 	@Autowired
 	@Value("${interface.log.home.address}")
