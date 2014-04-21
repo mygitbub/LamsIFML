@@ -99,5 +99,11 @@
         取值：可以是单个值，如6； 
               也可以是个范围，如9-12； 
               也可以是个列表，如9,11,13 
-              也可以是任意取值，使用*  -->
+              也可以是任意取值，使用* 
+      每晚11点同步
+	<task:scheduled-tasks>  
+        <task:scheduled ref="arcServcieImpl" method="initUserGroup" cron="0 0 23 * * ?"/>
+    </task:scheduled-tasks>
+     -->
+	
 </beans>
