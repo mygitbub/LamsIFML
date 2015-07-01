@@ -30,11 +30,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link WmUserLoginByPassword }
+     * Create an instance of {@link WmCheckUserByToken }
      * 
      */
-    public WmUserLoginByPassword createWmUserLoginByPassword() {
-        return new WmUserLoginByPassword();
+    public WmCheckUserByToken createWmCheckUserByToken() {
+        return new WmCheckUserByToken();
     }
 
     /**
@@ -46,11 +46,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link WmCheckUserByToken }
+     * Create an instance of {@link WmUserInfoExtResponse }
      * 
      */
-    public WmCheckUserByToken createWmCheckUserByToken() {
-        return new WmCheckUserByToken();
+    public WmUserInfoExtResponse createWmUserInfoExtResponse() {
+        return new WmUserInfoExtResponse();
     }
 
     /**
@@ -62,11 +62,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link WmUserInfoExtResponse }
+     * Create an instance of {@link WmUserLoginByPassword }
      * 
      */
-    public WmUserInfoExtResponse createWmUserInfoExtResponse() {
-        return new WmUserInfoExtResponse();
+    public WmUserLoginByPassword createWmUserLoginByPassword() {
+        return new WmUserLoginByPassword();
+    }
+
+    /**
+     * Create an instance of {@link GetUsernameByTicketResponse }
+     * 
+     */
+    public GetUsernameByTicketResponse createGetUsernameByTicketResponse() {
+        return new GetUsernameByTicketResponse();
     }
 
     /**
@@ -75,6 +83,14 @@ public class ObjectFactory {
      */
     public WmCheckUserByTokenResponse createWmCheckUserByTokenResponse() {
         return new WmCheckUserByTokenResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetUsernameByTicket }
+     * 
+     */
+    public GetUsernameByTicket createGetUsernameByTicket() {
+        return new GetUsernameByTicket();
     }
 
 }
