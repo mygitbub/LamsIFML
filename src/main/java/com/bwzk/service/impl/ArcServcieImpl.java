@@ -581,7 +581,11 @@ public class ArcServcieImpl  extends BaseService implements ArcService{
 	
 	private void syncActivitUser(){
 		String urlStr = "http://"+lamsIP+"/Lams/activiti/syn";
-		CommonUtil.doHttpGet(urlStr);
+		try {
+			CommonUtil.doHttpGet(urlStr);
+		} catch (Exception e) {
+			log.error("流程同步用户部门错误");
+		}
 	}
 	
 	private List<MLFieldMapping> mlFieldMapping = null;
