@@ -37,30 +37,22 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 			// 插入prjitem 然后查询案卷
 			volMapList = mlJdbcDao.quertListMap(gepsMappingBean.getVolSql()+" WHERE MLPID=" + mlPrjDid);
 			
-			prjItem.remove("XMID");
-			prjItem.remove("MLDID");
 			prjItem.put("PID", -1);
 			Integer unisPrjDid = insertMap(gepsMappingBean.getPrjTableName(), prjItem);// -- 插入项目
 			for (Map<String, Object> volItem : volMapList) {
 				Integer mlVolDid = getIntValue(volItem, "MLDID");
 				dFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.getdFileSql()+" WHERE MLPID=" + mlVolDid);
 				
-				volItem.remove("MLDID");
-				volItem.remove("MLPID");
 				volItem.put("PID", unisPrjDid);
 				Integer unisVolDid = insertMap(gepsMappingBean.getVolTableName(), volItem);// -- 插入案卷
 				for (Map<String, Object> dFileItem : dFileMapList) {
 					Integer mlDfileDid = getIntValue(dFileItem, "MLDID");
 					eFileMapList = mlJdbcDao.quertListMap(gepsMappingBean.geteFileSql()+" WHERE MLPID=" + mlDfileDid);
 					
-					dFileItem.remove("MLDID");
-					dFileItem.remove("MLPID");
 					dFileItem.put("PID", unisVolDid);
 					dFileItem.put("ATTACHED", eFileMapList.size() > 0 ? 1  : 0 );//判断是否有电子文件 0 没有 1有
 					Integer unisDfileDid = insertMap(gepsMappingBean.getDfileTableName(), dFileItem);// -- 插入文件
 					for (Map<String, Object> efileItem : eFileMapList) {
-						efileItem.remove("MLDID");
-						efileItem.remove("MLPID");
 						efileItem.put("PID", unisDfileDid);
 						insertMap(gepsMappingBean.getEfileTableName(), efileItem);// -- 插入电子文件
 					}
@@ -68,9 +60,66 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 			}
 			//添加一条项目 修改一条
 			updateXmStatus(xmid);
+			
 		}
-		
+		dataReceive();
 		return mlJdbcDao.quertListMap("SELECT * FROM JGZLZJ_ML");
+	}
+	/**
+	 * 依次扫描视图中案卷级、文件级、电子文件级OtherState为0的条目，根据条目提供信息找到上级DID,然后实现集成
+	 * 注：前提需在档案系统项目、案卷、文件、电子文件表中增加MLDID、MLPID两个字段；需将OtherState改为0
+	 * 
+	 */
+	private void dataReceive(){
+		
+		GepsMappingBean gepsMappingBean = getMappingList();
+		String dprjTableName = gepsMappingBean.getPrjTableName();
+		String dvolSql = gepsMappingBean.getVolSql() + " WHERE  MLDID IN (SELECT MLID FROM JGZLZJ_ML WHERE OTHERSTATE = 0)";
+		List<Map<String, Object>> dvolMapList = mlJdbcDao.quertListMap(dvolSql);
+		for(Map<String , Object> dvolMap : dvolMapList){
+			Integer mldid = dvolMap.get("MLDID") == null ? -100 : Integer.parseInt(dvolMap.get("MLDID").toString());
+			Integer mlpid = dvolMap.get("MLPID") == null ? -100 : Integer.parseInt(dvolMap.get("MLPID").toString());
+			String getPrjDidSql = "select did from "+dprjTableName+" where mldid = "+mlpid+"";
+			String stringDid = jdbcDao.query4String(getPrjDidSql);
+			if(StringUtils.isNotBlank(stringDid)){
+				Integer dprjDid = stringDid == null ? -100 : Integer.parseInt(stringDid);
+				dvolMap.put("PID", dprjDid);
+				insertMap(gepsMappingBean.getVolTableName(), dvolMap);// -- 插入案卷
+				mlJdbcDao.update("UPDATE JGZLZJ_ML SET OTHERSTATE="+getsState+" WHERE MLID=" + mldid);// JGZLZJ_ML
+			}
+		}
+		String dvolTableName = gepsMappingBean.getVolTableName();
+		String dfileSql = gepsMappingBean.getdFileSql() + " WHERE  MLDID IN (SELECT ZLID FROM JGZLZJ_ZL WHERE OTHERSTATE = 0)";
+		List<Map<String, Object>> dfileMapList = mlJdbcDao.quertListMap(dfileSql);
+		for(Map<String , Object> dfileMap : dfileMapList){
+			Integer mldid = dfileMap.get("MLDID") == null ? -100 : Integer.parseInt(dfileMap.get("MLDID").toString());
+			Integer mlpid = dfileMap.get("MLPID") == null ? -100 : Integer.parseInt(dfileMap.get("MLPID").toString());
+			String getVolDidSql = "select did from "+dvolTableName+" where mldid = "+mlpid+"";
+			String stringDid = jdbcDao.query4String(getVolDidSql);
+			if(StringUtils.isNotBlank(stringDid)){
+				Integer dvolDid = stringDid == null ? -100 : Integer.parseInt(stringDid);
+				dfileMap.put("PID" , dvolDid);
+				insertMap(gepsMappingBean.getDfileTableName(), dfileMap);// -- 插入文件
+				mlJdbcDao.update("UPDATE JGZLZJ_ZL SET OTHERSTATE="+getsState+" WHERE ZLID=" + mldid);// JGZLZJ_ZL
+			}
+		}
+		String dfileTableName = gepsMappingBean.getDfileTableName();
+		String efileSql = gepsMappingBean.geteFileSql() + " WHERE  MLDID IN (SELECT FILEID FROM JGZLZJ_file WHERE OTHERSTATE = 0)";
+		List<Map<String, Object>> efileMapList = mlJdbcDao.quertListMap(efileSql);
+		for(Map<String , Object> efileMap : efileMapList){
+			Integer mldid = efileMap.get("MLDID") == null ? -100 : Integer.parseInt(efileMap.get("MLDID").toString());
+			Integer mlpid = efileMap.get("MLPID") == null ? -100 : Integer.parseInt(efileMap.get("MLPID").toString());
+			String getFileDidSql = "select did from "+dfileTableName+" where mldid = "+mlpid+"";
+			String stringDid = jdbcDao.query4String(getFileDidSql);
+			if(StringUtils.isNotBlank(stringDid)){
+				Integer dfileDid = stringDid == null ? -100 : Integer.parseInt(stringDid);
+				efileMap.put("PID", dfileDid);
+				insertMap(gepsMappingBean.getEfileTableName(), efileMap);// -- 插入电子文件
+				String UpdateSql = "update "+dfileTableName+" set attached = 1 where did = "+dfileDid+"";
+				execSql(UpdateSql);
+				mlJdbcDao.update("UPDATE JGZLZJ_FILE SET OTHERSTATE="+getsState+" WHERE FILEID = " + mldid);// JGZLZJ_FILE
+			}
+		}
 	}
 	
 	/**
