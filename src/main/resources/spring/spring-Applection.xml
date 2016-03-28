@@ -79,6 +79,9 @@
 	<tx:annotation-driven transaction-manager="txManager" />
 	<tx:annotation-driven transaction-manager="txManager_ML" />
 	
+	<task:scheduled-tasks>  
+        <task:scheduled ref="gepsService" method="projectList" cron="0 5 * * * *"/>
+    </task:scheduled-tasks> 
 	<!-- 下面是显示定时相关配置 
 	<task:scheduled-tasks>  
         <task:scheduled ref="userGropuServiceImp" method="ssss" cron="* * * * * *"/>
