@@ -33,15 +33,29 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
     
-	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="${jdbc.jndiName}" />
+<!-- 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!-- 		<property name="jndiName" value="${jdbc.jndiName}" /> -->
+<!-- 	</bean> -->
+	
+<!-- 	<!-- 梦龙的数据源 --> -->
+<!-- 	<bean id="dataSource_ml" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!-- 		<property name="jndiName" value="${jdbc.jndiName_ml}" /> -->
+<!-- 	</bean> -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
 	</bean>
 	
 	<!-- 梦龙的数据源 -->
-	<bean id="dataSource_ml" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="${jdbc.jndiName_ml}" />
+	<bean id="dataSource_ml" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${ml.jdbc.driverClassName}" />
+		<property name="url" value="${ml.jdbc.url}" />
+		<property name="username" value="${ml.jdbc.username}" />
+		<property name="password" value="${ml.jdbc.password}" />
 	</bean>
-
+	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapperLocations" value="classpath:mybatis/*.xml"></property>
@@ -79,6 +93,9 @@
 	<tx:annotation-driven transaction-manager="txManager" />
 	<tx:annotation-driven transaction-manager="txManager_ML" />
 	
+	<task:scheduled-tasks>  
+        <task:scheduled ref="gepsService" method="projectList" cron="0 5 * * * *"/>
+    </task:scheduled-tasks> 
 	<!-- 下面是显示定时相关配置 
 	<task:scheduled-tasks>  
         <task:scheduled ref="userGropuServiceImp" method="ssss" cron="* * * * * *"/>

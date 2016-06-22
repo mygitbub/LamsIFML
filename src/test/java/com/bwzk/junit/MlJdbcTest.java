@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.bwzk.service.i.ArcService;
 import com.bwzk.service.i.GepsService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -13,6 +14,8 @@ import com.bwzk.service.i.GepsService;
 public class MlJdbcTest {
 	@Autowired
 	private GepsService gepsService;
+	@Autowired
+	private ArcService arcServcieImpl;
 //updateXmStatus(Integer xmid){// test  1749501150
 //	@Test
 //	public void test01() {
@@ -20,6 +23,7 @@ public class MlJdbcTest {
 //	}
 	@Test
 	public void test02() {
-		gepsService.projectList();
+//		gepsService.projectList();
+		arcServcieImpl.initUserGroup();
 	}
 }

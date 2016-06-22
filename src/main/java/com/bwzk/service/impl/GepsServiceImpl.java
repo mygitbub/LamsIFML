@@ -32,7 +32,7 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 		List<Map<String, Object>> prjMapList = mlJdbcDao.quertListMap(gepsMappingBean.getPrjSql());
 
 		for (Map<String, Object> prjItem : prjMapList) {
-			Integer xmid = getIntValue(prjItem, "XMID");
+			Integer xmid = getIntValue(prjItem, "MLDID");
 			Integer mlPrjDid = getIntValue(prjItem, "MLDID");
 			// 插入prjitem 然后查询案卷
 			volMapList = mlJdbcDao.quertListMap(gepsMappingBean.getVolSql()+" WHERE MLPID=" + mlPrjDid);
@@ -63,18 +63,18 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 			
 		}
 		dataReceive();
-		return mlJdbcDao.quertListMap("SELECT * FROM JGZLZJ_ML");
+		return mlJdbcDao.quertListMap("SELECT * FROM TE_DAJC_AJMX");
 	}
 	/**
-	 * 依次扫描视图中案卷级、文件级、电子文件级OtherState为0的条目，根据条目提供信息找到上级DID,然后实现集成
-	 * 注：前提需在档案系统项目、案卷、文件、电子文件表中增加MLDID、MLPID两个字段；需将OtherState改为0
+	 * 依次扫描视图中案卷级、文件级、电子文件级F_OTHER_STATE为0的条目，根据条目提供信息找到上级DID,然后实现集成
+	 * 注：前提需在档案系统项目、案卷、文件、电子文件表中增加MLDID、MLPID两个字段；需将F_OTHER_STATE改为0
 	 * 
 	 */
 	private void dataReceive(){
 		
 		GepsMappingBean gepsMappingBean = getMappingList();
 		String dprjTableName = gepsMappingBean.getPrjTableName();
-		String dvolSql = gepsMappingBean.getVolSql() + " WHERE  MLDID IN (SELECT MLID FROM JGZLZJ_ML WHERE OTHERSTATE = 0)";
+		String dvolSql = gepsMappingBean.getVolSql() + " WHERE  MLDID IN (SELECT F_ID FROM TE_DAJC_AJMX WHERE F_OTHER_STATE = 0)";
 		List<Map<String, Object>> dvolMapList = mlJdbcDao.quertListMap(dvolSql);
 		for(Map<String , Object> dvolMap : dvolMapList){
 			Integer mldid = dvolMap.get("MLDID") == null ? -100 : Integer.parseInt(dvolMap.get("MLDID").toString());
@@ -85,11 +85,11 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 				Integer dprjDid = stringDid == null ? -100 : Integer.parseInt(stringDid);
 				dvolMap.put("PID", dprjDid);
 				insertMap(gepsMappingBean.getVolTableName(), dvolMap);// -- 插入案卷
-				mlJdbcDao.update("UPDATE JGZLZJ_ML SET OTHERSTATE="+getsState+" WHERE MLID=" + mldid);// JGZLZJ_ML
+				mlJdbcDao.update("UPDATE TE_DAJC_AJMX SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + mldid);// TE_DAJC_AJMX
 			}
 		}
 		String dvolTableName = gepsMappingBean.getVolTableName();
-		String dfileSql = gepsMappingBean.getdFileSql() + " WHERE  MLDID IN (SELECT ZLID FROM JGZLZJ_ZL WHERE OTHERSTATE = 0)";
+		String dfileSql = gepsMappingBean.getdFileSql() + " WHERE  MLDID IN (SELECT F_ID FROM TE_DAJC_JNML WHERE F_OTHER_STATE = 0)";
 		List<Map<String, Object>> dfileMapList = mlJdbcDao.quertListMap(dfileSql);
 		for(Map<String , Object> dfileMap : dfileMapList){
 			Integer mldid = dfileMap.get("MLDID") == null ? -100 : Integer.parseInt(dfileMap.get("MLDID").toString());
@@ -100,11 +100,11 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 				Integer dvolDid = stringDid == null ? -100 : Integer.parseInt(stringDid);
 				dfileMap.put("PID" , dvolDid);
 				insertMap(gepsMappingBean.getDfileTableName(), dfileMap);// -- 插入文件
-				mlJdbcDao.update("UPDATE JGZLZJ_ZL SET OTHERSTATE="+getsState+" WHERE ZLID=" + mldid);// JGZLZJ_ZL
+				mlJdbcDao.update("UPDATE TE_DAJC_JNML SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + mldid);// TE_DAJC_JNML
 			}
 		}
 		String dfileTableName = gepsMappingBean.getDfileTableName();
-		String efileSql = gepsMappingBean.geteFileSql() + " WHERE  MLDID IN (SELECT FILEID FROM JGZLZJ_file WHERE OTHERSTATE = 0)";
+		String efileSql = gepsMappingBean.geteFileSql() + " WHERE  MLDID IN (SELECT F_ID FROM TE_DAJC_ZLMX WHERE F_OTHER_STATE = 0)";
 		List<Map<String, Object>> efileMapList = mlJdbcDao.quertListMap(efileSql);
 		for(Map<String , Object> efileMap : efileMapList){
 			Integer mldid = efileMap.get("MLDID") == null ? -100 : Integer.parseInt(efileMap.get("MLDID").toString());
@@ -117,7 +117,7 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 				insertMap(gepsMappingBean.getEfileTableName(), efileMap);// -- 插入电子文件
 				String UpdateSql = "update "+dfileTableName+" set attached = 1 where did = "+dfileDid+"";
 				execSql(UpdateSql);
-				mlJdbcDao.update("UPDATE JGZLZJ_FILE SET OTHERSTATE="+getsState+" WHERE FILEID = " + mldid);// JGZLZJ_FILE
+				mlJdbcDao.update("UPDATE TE_DAJC_ZLMX SET F_OTHER_STATE="+getsState+" WHERE F_ID = " + mldid);// TE_DAJC_ZLMX
 			}
 		}
 	}
@@ -170,24 +170,22 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 	public Boolean updateXmStatus(Integer xmid){// test  1749501150
 		Boolean flag = false;
 		try {
-			mlJdbcDao.update("UPDATE JGZLZJ_XM SET OTHERSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_XM
-			mlJdbcDao.update("UPDATE JGZLZJ_DWGC SET OTHERSTATE="+getsState+" WHERE XMID=" + xmid);// JGZLZJ_DWGC
-			List<Map<String, Object>> dwgcList = mlJdbcDao.quertListMap("SELECT XMID,DWGCID FROM JGZLZJ_DWGC WHERE XMID=" + xmid);
-			for (Map<String, Object> dwgc : dwgcList) {
-				Integer dwgcId = dwgc.get("DWGCID") == null ? -1 : Integer.parseInt(dwgc.get("DWGCID").toString());
-				mlJdbcDao.update("UPDATE JGZLZJ_ML SET OTHERSTATE="+getsState+" WHERE DWGCID=" + dwgcId);// JGZLZJ_ML
-				List<Map<String, Object>> mlList = mlJdbcDao.quertListMap("SELECT MLID,DWGCID FROM JGZLZJ_ML WHERE DWGCID=" + dwgcId);
+			mlJdbcDao.update("UPDATE TE_DAJC_DAML SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + xmid);// TE_DAJC_DAML
+				List<Map<String, Object>> mlList = mlJdbcDao.quertListMap("SELECT F_ID FROM TE_DAJC_AJMX WHERE F_DAML_ID=" + xmid);
 				for (Map<String, Object> ml : mlList) {
-					Integer mlid = ml.get("MLID") == null ? -1 : Integer.parseInt(ml.get("MLID").toString());
-					mlJdbcDao.update("UPDATE JGZLZJ_ZL SET OTHERSTATE="+getsState+" WHERE MLID=" + mlid);// JGZLZJ_ZL
-					List<Map<String, Object>> zlList = mlJdbcDao.quertListMap("SELECT ZLID,MLID FROM JGZLZJ_ZL WHERE MLID=" + mlid);
+					Integer mlid = ml.get("F_ID") == null ? -1 : Integer.parseInt(ml.get("F_ID").toString());
+					mlJdbcDao.update("UPDATE TE_DAJC_AJMX SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + mlid);//TE_DAJC_AJMX
+					List<Map<String, Object>> zlList = mlJdbcDao.quertListMap("SELECT F_ID FROM TE_DAJC_JNML WHERE F_AJMX_ID=" + mlid);
 					for (Map<String, Object> zl : zlList) {
-						Integer zlid = zl.get("ZLID") == null ? -1 : Integer.parseInt(zl.get("ZLID").toString());
-						mlJdbcDao.update("UPDATE JGZLZJ_FILE SET OTHERSTATE="+getsState+" WHERE ZLID=" + zlid);// JGZLZJ_FILE
+						Integer zlid = zl.get("F_ID") == null ? -1 : Integer.parseInt(zl.get("F_ID").toString());
+						mlJdbcDao.update("UPDATE TE_DAJC_JNML SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + zlid);// TE_DAJC_JNML
+						List<Map<String, Object>> eList = mlJdbcDao.quertListMap("SELECT F_ID FROM TE_DAJC_ZLMX WHERE F_JNML_ID=" + mlid);
+						for (Map<String, Object> el : eList) {
+							Integer eid = el.get("F_ID") == null ? -1 : Integer.parseInt(el.get("F_ID").toString());
+							mlJdbcDao.update("UPDATE TE_DAJC_ZLMX SET F_OTHER_STATE="+getsState+" WHERE F_ID=" + eid);// TE_DAJC_ZLMX
+						}
 					}
-					
 				}
-			}
 			flag = true;
 		} catch (Exception e) {
 			flag = false;
@@ -206,7 +204,8 @@ public class GepsServiceImpl  extends BaseService  implements GepsService {
 	*/
 	private Integer getIntValue(Map<String , Object> mapItem , String key){
 		Integer tempInt = -1;
-		if(mapItem != null && mapItem.get(key) != null && mapItem.get(key) instanceof Integer){
+//		if(mapItem != null && mapItem.get(key) != null && mapItem.get(key) instanceof Integer){
+			if(mapItem != null && mapItem.get(key) != null){
 			try {
 				tempInt = Integer.parseInt(mapItem.get(key).toString());
 			} catch (Exception e) {

@@ -493,6 +493,9 @@ public class ArcServcieImpl  extends BaseService implements ArcService{
 		}
 		for (MLDepNewDataSet.Table table : mlDepTableList) {
 			if(table.getDEPID().equals(table.getDEPPARENTID())){
+//				System.out.print(table.getDEPNAME()+": ");
+//				System.out.print(table.getDEPPARENTID()+":");
+//				System.out.println(table.getDEPID());
 				continue;
 			}else{
 				if(table.getDEPPARENTID().equals(depID)){
