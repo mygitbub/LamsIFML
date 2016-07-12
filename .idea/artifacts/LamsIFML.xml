@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="LamsIFML">
+    <output-path>$PROJECT_DIR$/out/artifacts/LamsIFML.war</output-path>
+    <root id="archive" name="LamsIFML.war">
+      <element id="artifact" artifact-name="LamsIFML:war exploded" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
