@@ -1,4 +1,15 @@
-/target
+*.class
+# Package Files #
+*.war
+*.ear
+hs_err*.log
+/ams-biz/target
+/ams-core/target
+/ams/WebContent/WEB-INF/classes
+/.svn
 /.settings
 /.classpath
 /.project
+*.iml
+/.idea
+/out
