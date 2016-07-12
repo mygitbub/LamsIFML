@@ -1,17 +1,10 @@
 package com.bwzk.action;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
-
+import ch.qos.logback.classic.Logger;
+import com.bwzk.service.i.ArcService;
+import com.bwzk.service.i.GepsService;
+import com.bwzk.service.i.NoticeService;
+import com.bwzk.util.GlobalFinalAttr;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -26,12 +19,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.tempuri.MrBaseService;
 import org.tempuri.MrBaseServiceSoap;
 
-import ch.qos.logback.classic.Logger;
-
-import com.bwzk.service.i.ArcService;
-import com.bwzk.service.i.GepsService;
-import com.bwzk.service.i.NoticeService;
-import com.bwzk.util.GlobalFinalAttr;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Holder;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.List;
 
 @Controller
 public class CommonCtler {
@@ -134,10 +132,17 @@ public class CommonCtler {
 	 */
 	@RequestMapping(value="/sso" , method = RequestMethod.GET)
 	public String sso(@RequestParam String  usercode , @RequestParam String token ){
-		String lamsUrl = "http://"+lamsIP+"/Lams/directLogin?usercode=";
 		Boolean result = judgeSSO(usercode, token);
+		String lamsUrl = "http://"+lamsIP+"/Lams/directLoginEncoding?usercode=";
 		if(result){//返回0 表示成功
+			try {
+				usercode = URLEncoder.encode(usercode ,"UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error("验证失败!");
+			}
 			lamsUrl = lamsUrl + usercode;
+//			System.out.println("lamsUrl:"+lamsUrl);
 			log.error("验证成功可以登录档案系统!");			
 		}else{
 			log.error("验证失败!");			
@@ -223,4 +228,8 @@ public class CommonCtler {
 	@Value("${lams.ip}")
 	private String lamsIP;//档案服务器ip
 	private Logger log =  (Logger) LoggerFactory.getLogger(this.getClass());
+
+	public static void main(String[] args) {
+		System.out.println(URLEncoder.encode("袁娇丽0112"));
+	}
 }
